@@ -1,12 +1,21 @@
 {% extends "template.html" %}
 {% block content %}
-    <h1>Welcome to FlaskTaskR</h1>
+    <h1>Welcome to Flask-Polls</h1>
     <br/>
+    <h2>Current Polls</h2>
+    <p>CLick on a poll to participate</p>
+    <ul>Polls:
+    {% for poll in all_polls %}
+       <li>{{ poll.question }}
+       <a href="{{ url_for('poll', poll_id = poll.poll_id) }}"></li>
+    </ul>
+{% endblock %}
+<!--
     <a href="/logout">Logout</a>
     <div class="add-task">
         <h3>Add a new task:</h3>
           <form method="POST" action="{{ url_for('new_task') }}">
-            <p>{{ form.name.label }}: {{ form.name }}<br />{{ form.due_date.label }}: 
+            <p>{{ form.name.label }}: {{ form.name }}<br />{{ form.due_date.label }}:
         {{ form.due_date }}&nbsp;{{ form.posted_date.label }}: {{ form.posted_date }}&nbsp;{{ form.priority.label }}: {{ form.priority }}</p>
             <p><input type="submit" value="Submit"></p
           </form>
@@ -28,18 +37,18 @@
         </tr>
         </thread>
         {% for o in open_tasks %}
-        <tr> 
+        <tr>
         <td width="200px">{{ o.name }}</td>
         <td width="75px">{{ o.due_date }}</td>
         <td width="100px">{{ o.posted_date }}</td>
         <td width="50px">{{ o.priority }}</td>
         <td width="90px">{{ o.poster.name }}</td>
         <td>
-            <a href="{{ url_for('delete_entry', task_id = o.task_id) }}">Delete</a>  - 
+            <a href="{{ url_for('delete_entry', task_id = o.task_id) }}">Delete</a>  -
             <a href="{{ url_for('complete', task_id = o.task_id) }}">Mark as Complete</a>
         </td>
-        </tr> 
-        {% endfor %} 
+        </tr>
+        {% endfor %}
     </table>
     </div>
     <br/>
@@ -59,7 +68,7 @@
         </tr>
         </thread>
         {% for c in closed_tasks %}
-        <tr> 
+        <tr>
         <td width="200px">{{ c.name }}</td>
         <td width="75px">{{ c.due_date }}</td>
         <td width="100px">{{ c.posted_date }}</td>
@@ -68,8 +77,9 @@
         <td>
            <a href="{{ url_for('delete_entry', task_id = c.task_id) }}">Delete</a>
         </td>
-        </tr> 
-        {% endfor %} 
+        </tr>
+        {% endfor %}
     </table>
     </div>
-{% endblock %}
+-->
+
