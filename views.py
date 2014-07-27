@@ -1,11 +1,13 @@
 from app import app, db
-from flask import Flask, flash, redirect, render_template.
-    request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
-from forms import PollForm, ChoiceForm, LoginForm
+from forms import LoginForm, PollForm, ChoiceForm
 from models import Admin, Poll, Choice
 
-# app and db created on __init__
+#app = Flask(__name__)
+#app.config.from_object('config')
+#db = SQLAlchemy(app)
 
 def login_required(test):
     @wraps(test)
@@ -14,15 +16,17 @@ def login_required(test):
             return test(*args, **kwargs)
         else:
             flash("You need to login correctly.")
-            return redirect(url_for,'login')
+            return redirect(url_for('login'))
     return wrap
 
 # like django => no login on home page; just admin
 @app.route('/')
 def index():
     error = None
-    all_polls = db.session.query(Polls).all()
-    return render_template('index.html', all_polls)
+    polls = db.session.query(Polls).all()
+    return render_template('index.html',
+                            polls=polls,
+                            error = error)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -52,7 +56,7 @@ def admin():
             error = "You are not the master of this poll."
         else:
             session['logged_in'] = True
-            session['user_id'= u.id
+            session['user_id']= u.id
             flash('Manipulate the polls as you will, Master.')
             return redirect(url_for('master'))
 
@@ -142,6 +146,11 @@ def internal_error(error):
 @app.errorhandler(404)
 def internal_error(error):
     return render_template('404.html'), 404
+
+
+if __name__ == '__main__':
+    app.run()
+
 
 """
 # views.py

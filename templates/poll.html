@@ -1,0 +1,13 @@
+{% extends "template.html" %}
+{% block content %}
+    <h1>Welcome to Flask-Polls</h1>
+    <br/>
+    <h2>Current Poll</h2>
+    <br>
+    <h3>{{ poll.question }}</h3>
+    <ul>Choices:
+    {% for c in poll %}
+       <li>{{ c.choice }}
+       <a href="{{ url_for('poll', poll_id = poll.poll_id) }}"></li>
+    </ul>
+{% endblock %}

@@ -5,8 +5,8 @@
     <h2>Current Polls</h2>
     <p>CLick on a poll to participate</p>
     <ul>Polls:
-    {% for poll in all_polls %}
-       <li>{{ poll.question }}
+    {% for p in polls %}
+       <li>{{ p.question }}
        <a href="{{ url_for('poll', poll_id = poll.poll_id) }}"></li>
     </ul>
 {% endblock %}

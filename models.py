@@ -1,10 +1,9 @@
 from app import db
 from datetime import date
-# < db is a SQLAlchemy object created when __init__ called >
+# db is a SQLAlchemy object created when __init__ called >
 # using the above: from app import db
-# to call the SQLAlchemy Models and data Types you must use dot notation in the configuration
-# in contrast to "from sqlalchemy import Model, Column, Integer, String" which would allow you
-# to drop the db.Whatever
+# to call the SQLAlchemy Models and data Types you must use dot notation in #     the configuration
+# in contrast to "from sqlalchemy import Model, Column, Integer, String" which #     would allow you to drop the db.Whatever
 
 class Admin(db.Model):
 
@@ -31,12 +30,12 @@ class Poll(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.String(80), nullable=False)
     pub_date = dbi.Column(db.DateTime)
-    #admin_id links to Admin with ForeignKey() passed the backref from class Admin()
-    #but appears that this used more without a __tablename__
-    #as noted in Flask_SQLAlchemy documentation
+    # admin_id links to Admin with ForeignKey() passed the backref from class #    Admin()
+    # but appears that this used more without a __tablename__
+    # as noted in Flask_SQLAlchemy documentation
     #ELI5: admin_id is a database column for table poll linking Poll with Admin
     #      using dot notation with the backref property for Admin class
-    #admin_id = db.Column(db.ForeignKey('admin.id'))
+    # admin_id = db.Column(db.ForeignKey('admin.id'))
     choices = db.relationship('Choice', backref='poll')
 
     def __init__(self, question, pub_date = None):
