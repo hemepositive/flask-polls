@@ -4,8 +4,17 @@ from datetime import date
 
 db.create_all()
 
-db.session.add(Poll)...
-pass
+#y = Choice('yes')
+#n = Choice('no')
+p = Poll('Will you go with me?')
+p.question = Choice('yes')
+p.question = Choice('no')
+db.session.add(p)
+db.session.commit()
+
+polls = db.session.query(Poll).all()
+for e in polls:
+    print e
 
 '''
 from views import db

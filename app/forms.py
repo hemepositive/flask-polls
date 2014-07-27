@@ -1,5 +1,7 @@
-from flask.ext.wtf import Form, TextField, PasswordField, IntegerField, SelectField #, BooleanField
-from flask.ext.wtf import Required, EqualTo, Length
+from flask.ext.wtf import Form
+from wtforms import TextField, PasswordField
+from wtforms.validators import Required, Length
+
 
 class LoginForm(Form):
     name = TextField('Username', validators = [Required(),

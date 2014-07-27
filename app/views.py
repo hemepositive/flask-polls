@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
 from forms import LoginForm, PollForm, ChoiceForm
-from models import Admin, Poll, Choice
+from models import Poll, Choice
 
 # our login required decorator for the admin url
 def login_required(test):
@@ -29,9 +29,9 @@ def index():
 def login():
     error = None
     if request.method=='POST':
-        if request.form['username'] != app.config['USERNAME'] or
+        if request.form['username'] != app.config['USERNAME'] or \
             request.form['password'] != app.config['PASSWORD']:
-        error = 'Invalid Credentials. Please try again.'
+            error = 'Invalid Credentials. Please try again.'
         else:
             session['logged_in'] = True
             flash('You are logged in. Poll it up!.')
@@ -48,7 +48,7 @@ def detail(poll_id):
     return render_template('detail.html', poll=poll)
 
 @app.route('/vote/<int:poll_id>', methods=['POST'])
-def detail(poll_id):
+def vote(poll_id):
     # reassigning poll_id  to current_poll for some reason
     current_poll = poll_id
     poll = db.session.query(Poll).get_or_404(poll_id=current_poll)
@@ -76,29 +76,30 @@ def todo_read(id):
     return _todo_response(todo)
 '''
 
-    '''
-    class Choice(models.Model):
-    question = models.ForeignKey(Poll)
-    answer = models.CharField(max_length=30)
-    votes = models.IntegerField(default=0)
+'''
+class Choice(models.Model):
+question = models.ForeignKey(Poll)
+answer = models.CharField(max_length=30)
+votes = models.IntegerField(default=0)
 
-    def __unicode__(self):
-        return self.answer
-    ######################################################
-    question = db.session.query(Poll).filter_by() #???
-    yeas = db.session.query(Choice).filter_by()
-    nays = db.session.query(Choice).filter_by()
-    '''
+def __unicode__(self):
+    return self.answer
+######################################################
+question = db.session.query(Poll).filter_by() #???
+yeas = db.session.query(Choice).filter_by()
+nays = db.session.query(Choice).filter_by()
+
 
 @app.route('/create', methods = ['GET','POST'])
 @login_required()
 def create_poll():
     """ Function that allows admin to create a new poll """
     form = PollForm()
+    pass
 
-
+'''
 @app.route('/create', methods=['GET','POST'])
-@login_required()
+@login_required
 def create_poll():
     """Creates a new poll in the database"""
     if not session.get('logged_in'):
