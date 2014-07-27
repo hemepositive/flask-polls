@@ -5,9 +5,10 @@
     <h2>Current Poll</h2>
     <br>
     <h3>{{ poll.question }}</h3>
+    <p>Click on a choice to vote!</p>
     <ul>Choices:
     {% for c in poll %}
        <li>{{ c.choice }}
-       <a href="{{ url_for('poll', poll_id = poll.poll_id) }}"></li>
+       <a href="{{ url_for('vote', poll_id = poll.poll_id) }}"></li>
     </ul>
 {% endblock %}

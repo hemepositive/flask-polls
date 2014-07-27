@@ -13,6 +13,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE = "pollr.db"
 SECRET_KEY = "my_secret_key_of_hiding"
 DEBUG = True
+USERNAME = "admin"
+PASSWORD = "admin"
 
 DATABASE_PATH = os.path.join(basedir, DATABASE)
 
