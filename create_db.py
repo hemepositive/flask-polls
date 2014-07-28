@@ -20,7 +20,7 @@ nope.poll = new
 db.session.add_all([new, sure, nope])
 db.session.commit()
 
-
+'''
 polls = db.session.query(Poll).all()
 for e in polls:
     print e
@@ -28,4 +28,4 @@ for e in polls:
 choices = db.session.query(Choice).all()
 for e in choices:
     print e
-
+'''
