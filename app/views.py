@@ -2,7 +2,7 @@ from app import app, db
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
-from forms import LoginForm, PollForm, ChoiceForm
+from forms import LoginForm, PollForm, ChoiceForm, NewPollForm
 from models import Poll, Choice
 
 # our login required decorator for the admin url
@@ -20,7 +20,7 @@ def login_required(test):
 @app.route('/')
 def index():
     error = None
-    polls = db.session.query(Polls).all()
+    polls = db.session.query(Poll).all()
     return render_template('index.html',
                             polls=polls,
                             error = error)
@@ -44,20 +44,26 @@ def login():
 def detail(poll_id):
     # reassigning poll_id  to current_poll for some reason
     current_poll = poll_id
-    poll = db.session.query(Poll).get_or_404(poll_id=current_poll)
+    poll = db.session.query(Poll).get(current_poll)
     return render_template('detail.html', poll=poll)
 
-@app.route('/vote/<int:poll_id>', methods=['POST'])
+@app.route('/vote/<int:choice_id>', methods=['POST'])
 def vote(poll_id):
     # reassigning poll_id  to current_poll for some reason
-    current_poll = poll_id
-    poll = db.session.query(Poll).get_or_404(poll_id=current_poll)
-    new_total = poll.votes + 1
-    db.session.query(Poll).filter_by(poll_id=current_poll).update({
+    current_choice = choice_id
+    choice = db.session.query(Choice).get(choice_id=current_choice)
+    new_total = choice.votes + 1
+    db.session.query(Choice).filter_by(choice_id=current_choice).update({
         "votes": new_total})
     db.session.commit()
     flash('Thanks for your vote!')
-    return render_template('detail.html', poll=poll)
+    # could send to results of this poll only but would use poll_id
+    return redirect(url_for('results'))
+
+@app.route('/results')
+def results():
+    polls = db.session.query(Poll).all()
+    return render_template('results.html', polls=polls)
 
 '''
 @app.route('/complete/<int:task_id>/',)
@@ -76,28 +82,63 @@ def todo_read(id):
     return _todo_response(todo)
 '''
 
+@app.route('/create', methods = ['GET','POST'])
+@login_required
+def create_poll():
+    """ Function that allows admin to create a new poll """
+    error = None
+    poll_form = NewPollForm()
+    if poll_form.validate_on_submit():
+        new_poll = models.Poll(request.form['question'])
+        first_choice = models.Choice(request.form['first_choice'])
+        first_choice = models.Choice(request.form['second_choice'])
+        # add choices to new_poll
+        new_poll.choices = first_choice
+        new_poll.choices = second_choice
+        # now the database stuff
+        db.session.add(new_poll)
+        db.commit()
+        flash("New poll created.")
+        return redirect(url_for('admin'))
+    else:
+        error = "Error in creation. Retry"
+        redirect(url_for('create_poll', error=error))
+    return render_template('create.html', form=form, error=error)
+
+
 '''
-class Choice(models.Model):
-question = models.ForeignKey(Poll)
-answer = models.CharField(max_length=30)
-votes = models.IntegerField(default=0)
+from: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
+>>> john = Employee(name='john')
+>>> it_department = Department(name='IT')
+>>> john.department = it_department
+>>> s = session()
+>>> s.add(john)
+>>> s.add(it_department)
+>>> s.commit()
+>>> it = s.query(Department).filter(Department.name == 'IT').one()
+>>> it.employees
+[]
+>>> it.employees[0].name
+u'john'
+'''
 
-def __unicode__(self):
-    return self.answer
-######################################################
-question = db.session.query(Poll).filter_by() #???
-yeas = db.session.query(Choice).filter_by()
-nays = db.session.query(Choice).filter_by()
-
-
+'''
 @app.route('/create', methods = ['GET','POST'])
 @login_required()
 def create_poll():
     """ Function that allows admin to create a new poll """
-    form = PollForm()
+    poll_form = PollForm()
+    first_choice_form = ChoiceForm()
+    second_choice_form = ChoiceForm()
+    if poll_form.validate_on_submit() and \
+        first_choice_form.validate_on_submit() and \
+        second_choice_form.validate_on_submit():
+        new_poll = models.Poll(request.form['question'])
+        new_poll.session.add(choices = request.form['first_choice'])
+        new_poll.session.add(choices = request.form['second_choice'])
     pass
 
-'''
+
 @app.route('/create', methods=['GET','POST'])
 @login_required
 def create_poll():
@@ -114,7 +155,7 @@ def create_poll():
     db.session.commit()
     flash('New entry was successfully posted')
     return redirect(url_for('admin'))
-
+'''
 
 @app.route('/update/<int:post_id>', methods=['GET','POST'])
 def update(post_id):

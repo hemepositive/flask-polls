@@ -4,10 +4,17 @@
     <br/>
     <h2>Results for Current Poll</h2>
     <br>
-    <h3>{{ poll.question }}</h3>
-    <ul>Choices:
-    {% for c in poll %}
-       <li>{{ c.choice }}
-       <a href="{{ url_for('detail', poll_id = poll.poll_id) }}"></li>
+    <ul>Polls:
+    {% for poll in polls %}
+       <li>{{ poll.question }}</li>
+       <br/>
+       <ul>Results:
+       <!-- uncertain how to loop through objects in the poll -->
+         {% for choice in poll.choices %}
+         <li>{{ poll.choices.choice }}</li>
+         <br/>
+         </ul>
+         {% endfor %}
     </ul>
+    {% endfor %}
 {% endblock %}

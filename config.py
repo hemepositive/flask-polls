@@ -10,11 +10,13 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 #  The full list of config options are linked above
 #  So to be different I will set debug to True here and simplify our run.py
 
-DATABASE = "pollr.db"
+DATABASE = "polls.db"
 SECRET_KEY = "my_secret_key_of_hiding"
 DEBUG = True
+CSRF_ENABLED = True
 USERNAME = "admin"
 PASSWORD = "admin"
+#SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
 DATABASE_PATH = os.path.join(basedir, DATABASE)
 

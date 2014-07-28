@@ -3,12 +3,15 @@
     <h1>Welcome to Flask-Polls</h1>
     <br/>
     <h2>Current Polls</h2>
-    <p>CLick on a poll to participate</p>
+    <p>Select a poll to participate!</p>
+    <br/>
     <ul>Polls:
     {% for p in polls %}
        <li>{{ p.question }}
-       <a href="{{ url_for('poll', poll_id = poll.poll_id) }}"></li>
+       <a href="{{ url_for('detail', poll_id = p.id) }}">Go to poll</a>
+       </li>
     </ul>
+    {% endfor %}
 {% endblock %}
 <!--
     <a href="/logout">Logout</a>

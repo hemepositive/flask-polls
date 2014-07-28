@@ -1,9 +1,6 @@
 from app import db
 from datetime import date
-# db is a SQLAlchemy object created when __init__ called >
-# using the above: from app import db
-# to call the SQLAlchemy Models and data Types you must use dot notation in #     the configuration
-# in contrast to "from sqlalchemy import Model, Column, Integer, String" which #     would allow you to drop the db.Whatever
+
 
 class Poll(db.Model):
 
@@ -11,23 +8,20 @@ class Poll(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.String(80), nullable=False)
-    pub_date = db.Column(db.DateTime)
-    # admin_id links to Admin with ForeignKey() passed the backref from class #    Admin()
-    # but appears that this used more without a __tablename__
-    # as noted in Flask_SQLAlchemy documentation
-    #ELI5: admin_id is a database column for table poll linking Poll with Admin
-    #      using dot notation with the backref property for Admin class
-    # admin_id = db.Column(db.ForeignKey('admin.id'))
-    choices = db.relationship('Choice', backref='poll')
+    pub_date = db.Column(db.Date)
+    choices = db.relationship("Choice", backref="poll")
 
-    def __init__(self, question, pub_date = None):
+    def __init__(self, question, pub_date=None):
         self.question = question
         if pub_date == None:
             today = date.today()
         self.pub_date = today
+        # I don't think you __init__ relationships
+        #self.choices = choices
 
     def __repr__(self):
         return "<Poll %r>" % self.question
+
 
 class Choice(db.Model):
 
@@ -36,55 +30,21 @@ class Choice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     choice_text = db.Column(db.String(80))
     votes = db.Column(db.Integer)
-    poll_id = db.Column(db.Integer, db.ForeignKey('poll.id'))
+    # db.ForeignKey("use___tablename__.id")
+    poll_id = db.Column(db.Integer, db.ForeignKey("polls.id"))
 
-    def __init__(self, poll_id, choice_text= None, votes = None):
-        self.poll_id = poll_id
+    def __init__(self, choice_text, poll_id=None, votes=0):
+        # initing the poll_id which may be a problem
+        # setting to None on init in case Poll created before Choice
+        # use backref to assign poll_id
         self.choice_text = choice_text
-        # starting value for votes is None
+        self.poll_id = poll_id
         self.votes = votes
 
     def __repr__(self):
         return "<Choice %r>" % self.choice_text
 
-
 """
-**Not using Admin model in basic version of flask-polls**
-
-class Admin(db.Model):
-
-    __tablename__ = "admin"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(16), nullable=False)
-    password = db.Column(db.String(16), nullable=False)
-    #not sure that at most basic level the Poll class needs link to Admin class
-    poll = db.relationship('Poll', backref = "administrator")
-
-    def __init__(self, name, password):
-        self.name = name
-        self.password = password
-
-    def __repr__(self):
-        return '<Admin %r>' % self.name
-"""
-
-
-"""
-EXAMPLE OF backref() -------------------------------------------
-
-class Parent(Base):
-    __tablename__ = 'parent'
-    id = Column(Integer, primary_key=True)
-    children = relationship("Child", backref="parent")
-
-class Child(Base):
-    __tablename__ = 'child'
-    id = Column(Integer, primary_key=True)
-    parent_id = Column(Integer, ForeignKey('parent.id'))
-
-END EXAMPLE-----------------------------------------------------
-
 Models from DJANGO POLLS:
 
 **Initial version**

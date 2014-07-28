@@ -8,7 +8,9 @@
     <p>Click on a choice to vote!</p>
     <ul>Choices:
     {% for c in poll %}
-       <li>{{ c.choice }}
-       <a href="{{ url_for('vote', poll_id = poll.poll_id) }}"></li>
+       <li>{{ c.choices }}
+       <a href="{{ url_for('vote', choice_id = c.choices.id) }}">Click</a>
+       </li>
     </ul>
+    {% endfor %}
 {% endblock %}
