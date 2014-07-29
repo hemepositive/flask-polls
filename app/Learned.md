@@ -32,6 +32,8 @@ def vote(choice_id):
 
 The backref is useful.
 
+__init__ in models not necessary. Things like pub_date using datetime can be created in view.
+
 It is possible to place the ForeignKey column and relationship column in one class rather than splitting them up (one-many).
 
 If you are creating a class object (model)  that will have a relationship to another model, all of the objects need to be created and "assigned" before commiting to database as the unique ids are required for assignment/relationship.

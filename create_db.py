@@ -1,9 +1,11 @@
 from app import db
-from app.models import Poll, Choice
+from app.models import Poll, Choice, Admin
 from datetime import date
 
 db.drop_all()
 db.create_all()
+
+# playing around with multiple ways to create db obects
 
 p = Poll('Will you go with me?')
 y = Choice('yes')
@@ -27,6 +29,8 @@ a.poll = q
 b.poll = q
 db.session.add_all([a, b, q])
 
+admin = Admin(username='admin', password='admin')
+db.session.add(admin)
 
 db.session.commit()
 

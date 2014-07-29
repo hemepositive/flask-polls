@@ -3,7 +3,14 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
 from forms import LoginForm, PollForm, ChoiceForm, NewPollForm
-from models import Poll, Choice
+from models import Poll, Choice, Admin
+
+"""
+todo:
+-consider making admin screen like a dashboard for crud rather than all split up. That would be much better
+-get login working so @login_required can be uncommented/useful
+-finish update
+"""
 
 # our login required decorator for the admin url
 def login_required(test):
@@ -26,41 +33,47 @@ def index():
                             error = error)
 
 '''
-@app.route('/admin', methods=['GET','POST'])
-def login():
-    error = None
-    form = LoginForm()
+from explore flask
+
+@app.route('signin', methods=["GET", "POST"])
+def signin():
+    form = UsernamePasswordForm()
+
     if form.validate_on_submit():
-        if form['username'] != app.config['USERNAME'] or \
-                form['password'] != app.config['PASSWORD']:
-            error = 'Error with admin username or password. Try again'
-            #flash('Error with admin username or password. Try again')
+        user = User.query.filter_by(username=form.username.data).first_or_404()
+        if user.is_correct_password(form.password.data):
+            login_user(user)
+
+            return redirect(url_for('index'))
         else:
-            session['logged_in'] = True
-            return redirect(url_for('edit'))
-    return render_template("login.html",
-                           form=form,
-                           error=error)
+            return redirect(url_for('signin'))
+    return render_template('signin.html', form=form)
 '''
 
+# admin login not working
 @app.route('/admin', methods=['GET', 'POST'])
 def login():
     error = None
-    form = LoginForm()
-    if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME'] or\
-                request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid Credentials. Please try again.'
+    if request.method=='POST':
+        u = Admin.query.filter_by(username=request.form['username'],
+                          password=request.form['password']).first()
+        if u is None:
+            error = 'Invalid username or password.'
         else:
             session['logged_in'] = True
+            session['user_id'] = u.id
+            flash('You are logged in. Go Crazy.')
             return redirect(url_for('edit'))
-    return render_template('login.html', error=error, form=form)
+
+    return render_template("login.html",
+                           form = LoginForm(),
+                           error = error)
 
 
 @app.route('/edit', methods=['GET','POST'])
 #@login_required
 def console():
-    return "You are in edit"
+    return "You are in edit mode; this may be a dashboard  rather than admin only being a login"
 
 @app.route('/detail/<int:poll_id>', methods=['GET','POST'])
 def detail(poll_id):
@@ -99,6 +112,7 @@ def todo_read(id):
     return _todo_response(todo)
 '''
 
+#problem with POSTing the data
 @app.route('/create', methods = ['GET','POST'])
 #@login_required
 def create_poll():
@@ -106,17 +120,17 @@ def create_poll():
     error = None
     poll_form = NewPollForm(crsf_enabled=False)
     if poll_form.validate_on_submit():
-        new_poll = models.Poll(request.form['question'])
-        first_choice = models.Choice(request.form['first_choice'])
-        first_choice = models.Choice(request.form['second_choice'])
+        new_poll = models.Poll(form.question.data)
+        first_choice = models.Choice(form.first_choice.data)
+        second_choice = models.Choice(form.second_choice.data)
         # add choices to new_poll
         new_poll.choices = first_choice
         new_poll.choices = second_choice
         # now the database stuff
-        db.session.add(new_poll)
+        db.session.add_all([new_poll, first_choice, second_choice])
         db.commit()
         flash("New poll created.")
-        return redirect(url_for('admin'))
+        return redirect(url_for('create'))
     else:
         error = "Error in creation. Retry"
         redirect(url_for('create_poll', error=error))
@@ -141,19 +155,19 @@ u'john'
 @app.route('/update/<int:post_id>', methods=['GET','POST'])
 def update(post_id):
     """Update a poll from database"""
-    try:
-        poll_form = PollForm(crsf_enabled=False)
-        choice_form = ChoiceForm(crsf_enabled=False)
-        current_poll = poll_id
-        poll = db.session.query(Poll).get(poll_id=current_poll)
+    pass
+    '''
+    poll_form = PollForm(crsf_enabled=False)
+    choice_form = ChoiceForm(crsf_enabled=False)
+    current_poll = poll_id
+    poll = db.session.query(Poll).get(poll_id=current_poll)
+    db.session.query(models.Flaskr).filter_by(post_id=new_id).()
+    db.session.commit()
+    flash('The poll has been updated.')
+    return redirect(url_for('edit'))
+    '''
 
-        db.session.query(models.Flaskr).filter_by(post_id=new_id).delete()
-        db.session.commit()
-        flash('The poll has been updated.')
-    except Exception as e:
-        result = { 'status':0, 'message': repr(e) }
-    return jsonify(result)
-
+# work in progress
 @app.route('/delete/<int:poll_id>', methods=['GET','POST'])
 def delete(poll_id):
     """Deletes a poll from database"""

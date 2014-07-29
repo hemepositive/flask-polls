@@ -14,8 +14,8 @@ DATABASE = "polls.db"
 SECRET_KEY = "my_secret_key_of_hiding"
 DEBUG = True
 CSRF_ENABLED = True
-USERNAME = "admin"
-PASSWORD = "admin"
+#USERNAME = "admin"
+#PASSWORD = "admin"
 #SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
 DATABASE_PATH = os.path.join(basedir, DATABASE)

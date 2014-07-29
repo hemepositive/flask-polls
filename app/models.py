@@ -7,7 +7,7 @@ class Poll(db.Model):
     __tablename__ = "polls"
 
     id = db.Column(db.Integer, primary_key=True)
-    question = db.Column(db.String(80), nullable=False)
+    question = db.Column(db.String(200), nullable=False)
     pub_date = db.Column(db.Date)
     choices = db.relationship("Choice", backref="poll")
 
@@ -16,19 +16,18 @@ class Poll(db.Model):
         if pub_date == None:
             today = date.today()
         self.pub_date = today
-        # I don't think you __init__ relationships
-        #self.choices = choices
 
     def __repr__(self):
         return "<Poll %r>" % self.question
 
+    # could create a decorator for was_published_recently
 
 class Choice(db.Model):
 
     __tablename__ = "choices"
 
     id = db.Column(db.Integer, primary_key=True)
-    choice_text = db.Column(db.String(80))
+    choice_text = db.Column(db.String(200))
     votes = db.Column(db.Integer)
     # db.ForeignKey("use___tablename__.id")
     poll_id = db.Column(db.Integer, db.ForeignKey("polls.id"))
@@ -43,6 +42,24 @@ class Choice(db.Model):
 
     def __repr__(self):
         return "<Choice %r>" % self.choice_text
+
+
+class Admin(db.Model):
+
+    __tablename__ = "admins"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20))
+    password = db.Column(db.String(20))
+    # passing on making relationships with Poll(s) for now
+    # passing on __init__ as optional
+
+    def __repr__(self):
+        return "<Admin %r>" % self.username
+
+
+
+
 
 """
 Models from DJANGO POLLS:
