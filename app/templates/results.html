@@ -4,17 +4,17 @@
     <br/>
     <h2>Results for Current Poll</h2>
     <br>
-    <ul>Polls:
-    {% for poll in polls %}
-       <li>{{ poll.question }}</li>
-       <br/>
-       <ul>Results:
-       <!-- uncertain how to loop through objects in the poll -->
-         {% for choice in poll.choices %}
-         <li>{{ poll.choices.choice }}</li>
-         <br/>
-         </ul>
-         {% endfor %}
+    <h3>Polls:</h3>
+    <ul>
+        {% for poll in polls %}
+          <li><em>{{ poll.question }}</em></li>
+          <p>Results:</p>
+            <ul>
+              {% for choice in poll.choices %}
+                <li>{{ choice.votes }}</li>
+              {% endfor %}
+            <br/>
+            </ul>
+        {% endfor %}
     </ul>
-    {% endfor %}
 {% endblock %}

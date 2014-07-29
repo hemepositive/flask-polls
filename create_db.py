@@ -18,6 +18,16 @@ new = Poll('Can I call you sometime?')
 sure.poll = new
 nope.poll = new
 db.session.add_all([new, sure, nope])
+#db.session.commit()
+
+q = Poll('You got a phone number?')
+a = Choice('NO!')
+b = Choice('YESS!.')
+a.poll = q
+b.poll = q
+db.session.add_all([a, b, q])
+
+
 db.session.commit()
 
 '''

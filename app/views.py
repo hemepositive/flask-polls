@@ -25,37 +25,61 @@ def index():
                             polls=polls,
                             error = error)
 
+'''
+@app.route('/admin', methods=['GET','POST'])
+def login():
+    error = None
+    form = LoginForm()
+    if form.validate_on_submit():
+        if form['username'] != app.config['USERNAME'] or \
+                form['password'] != app.config['PASSWORD']:
+            error = 'Error with admin username or password. Try again'
+            #flash('Error with admin username or password. Try again')
+        else:
+            session['logged_in'] = True
+            return redirect(url_for('edit'))
+    return render_template("login.html",
+                           form=form,
+                           error=error)
+'''
 
 @app.route('/admin', methods=['GET', 'POST'])
 def login():
     error = None
     form = LoginForm()
-    if request.method=='POST':
-        if request.form['username'] != app.config['USERNAME'] or \
-            request.form['password'] != app.config['PASSWORD']:
+    if request.method == 'POST':
+        if request.form['username'] != app.config['USERNAME'] or\
+                request.form['password'] != app.config['PASSWORD']:
             error = 'Invalid Credentials. Please try again.'
         else:
             session['logged_in'] = True
-            flash('You are logged in. Poll it up!.')
-            return redirect(url_for('console'))
-    return render_template("login.html",
-                           form = form,
-                           error = error)
+            return redirect(url_for('edit'))
+    return render_template('login.html', error=error, form=form)
 
-@app.route('/detail/<int:poll_id>', methods=['GET', 'POST'])
+
+@app.route('/edit', methods=['GET','POST'])
+#@login_required
+def console():
+    return "You are in edit"
+
+@app.route('/detail/<int:poll_id>', methods=['GET','POST'])
 def detail(poll_id):
-    # reassigning poll_id  to current_poll for some reason
+    # reassigning poll_id  to current_poll (why?)
     current_poll = poll_id
-    poll = db.session.query(Poll).get(current_poll)
+    poll = Poll.query.get_or_404(current_poll)
     return render_template('detail.html', poll=poll)
 
-@app.route('/vote/<int:choice_id>', methods=['POST'])
-def vote(poll_id):
-    # reassigning poll_id  to current_poll for some reason
-    current_choice = choice_id
-    choice = db.session.query(Choice).get(choice_id=current_choice)
+@app.route('/vote/<int:choice_id>', methods=['GET','POST'])
+def vote(choice_id):
+    # reassigning poll_id  to current_poll (why?)
+    current_id = choice_id
+    # using fisrt_or_404 but does not work using db.session
+    choice = Choice.query.filter_by(id=current_id).first_or_404()
+    print choice.votes
     new_total = choice.votes + 1
-    db.session.query(Choice).filter_by(choice_id=current_choice).update({
+    print choice.votes
+    # db.session for updating
+    db.session.query(Choice).filter_by(id=current_id).update({
         "votes": new_total})
     db.session.commit()
     flash('Thanks for your vote!')
@@ -76,11 +100,11 @@ def todo_read(id):
 '''
 
 @app.route('/create', methods = ['GET','POST'])
-@login_required
+#@login_required
 def create_poll():
     """ Function that allows admin to create a new poll """
     error = None
-    poll_form = NewPollForm()
+    poll_form = NewPollForm(crsf_enabled=False)
     if poll_form.validate_on_submit():
         new_poll = models.Poll(request.form['question'])
         first_choice = models.Choice(request.form['first_choice'])
@@ -96,7 +120,7 @@ def create_poll():
     else:
         error = "Error in creation. Retry"
         redirect(url_for('create_poll', error=error))
-    return render_template('create.html', form=form, error=error)
+    return render_template('create.html', form=poll_form, error=error)
 
 '''
 from: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
@@ -118,8 +142,8 @@ u'john'
 def update(post_id):
     """Update a poll from database"""
     try:
-        poll_form = PollForm()
-        choice_form = ChoiceForm()
+        poll_form = PollForm(crsf_enabled=False)
+        choice_form = ChoiceForm(crsf_enabled=False)
         current_poll = poll_id
         poll = db.session.query(Poll).get(poll_id=current_poll)
 

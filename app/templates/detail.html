@@ -6,11 +6,27 @@
     <br>
     <h3>{{ poll.question }}</h3>
     <p>Click on a choice to vote!</p>
-    <ul>Choices:
-    {% for c in poll %}
-       <li>{{ c.choices }}
-       <a href="{{ url_for('vote', choice_id = c.choices.id) }}">Click</a>
-       </li>
+    <ul>
+      {% for c in poll.choices %}
+         <li><em>{{ c.choice_text }}</em>
+           <a href="{{ url_for('vote', choice_id = c.id) }}">Vote</a>
+         </li>
+         <br/>
+      {% endfor %}
     </ul>
-    {% endfor %}
 {% endblock %}
+
+
+<!--
+QUERIES
+>>> p
+<Poll u'You got a phone number?'>
+>>> p.choices
+[<Choice u'YESS!'>, <Choice u'NEVER!'>]
+>>> for c in p.choices:
+...     print c.id
+...
+5
+6
+>>>
+-->
