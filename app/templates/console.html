@@ -1,0 +1,29 @@
+{% extends "template.html" %}
+{% block content %}
+    <h1>Welcome to Flask-Polls</h1>
+    <br/>
+    <h2>Admin Console</h2>
+      <br/>
+      <ul>Select a poll to edit:
+      {% for p in polls %}
+         <li>{{ p.question }}
+         <a href="{{ url_for('edit', poll_id = p.id) }}">Select</a>
+         </li>
+      </ul>
+      {% endfor %}
+      <ul>Select a poll to edit:
+      {% for p in polls %}
+         <li>{{ p.question }}
+         <a href="{{ url_for('update', poll_id = p.id) }}">Select</a>
+         </li>
+      </ul>
+      {% endfor %}
+    <h2>Create a New Polls</h2>
+      <br/>
+      <form method="post" action="{{url_for('create_poll')">
+        <p>{{ form.question}}<br/>
+           {{ form.first_choice }}<br/>
+           {{ form.second_choice }}<br/></p>
+        <p><input type="submit" value="Submit"></p>
+      </form>
+{% endblock %}

@@ -2,24 +2,15 @@
 {% block content %}
     <h1>Welcome to Flask-Polls</h1>
     <br/>
-    <h2>Edit a Poll</h2>
-    <br/>
-    <ul>Question:
-       <li>{{ poll.question }}</li>
-       <br/>
-       <ul>Choice:
-       <!-- uncertain how to loop through objects in the poll -->
-         {% for choice in poll.choices %}
-         <li>{{ poll.choices.choice }}</li>
-         <br/>
-         </ul>
-         {% endfor %}
+    <h2>Current Poll</h2>
+    <br>
+    <h3>{{ poll.question }}</h3>
+    <p>Click on a choice to vote!</p>
+    <ul>Choices:
+    {% for c in poll %}
+       <li>{{ c.choices }}
+       <a href="{{ url_for('vote', choice_id = c.choices.id) }}">Click</a>
+       </li>
     </ul>
-    <br/>
-    <form method="post" action="{{url_for('create_poll')">
-      <p>{{ poll_form.question}}<br/>
-         {{ choice_form.choice_text }}<br/>
-         {{ choice_form.choice_text }}<br/></p>
-      <p><input type="submit" value="Submit"></p>
-    </form>
+    {% endfor %}
 {% endblock %}

@@ -25,9 +25,11 @@ def index():
                             polls=polls,
                             error = error)
 
+
 @app.route('/admin', methods=['GET', 'POST'])
 def login():
     error = None
+    form = LoginForm()
     if request.method=='POST':
         if request.form['username'] != app.config['USERNAME'] or \
             request.form['password'] != app.config['PASSWORD']:
@@ -35,9 +37,9 @@ def login():
         else:
             session['logged_in'] = True
             flash('You are logged in. Poll it up!.')
-            return redirect(url_for('editor'))
+            return redirect(url_for('console'))
     return render_template("login.html",
-                           form = LoginForm(),
+                           form = form,
                            error = error)
 
 @app.route('/detail/<int:poll_id>', methods=['GET', 'POST'])
