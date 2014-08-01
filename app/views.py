@@ -1,6 +1,5 @@
 from app import app, db
-from flask import Flask, flash, redirect, render_template, request, session, url_for
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask import flash, redirect, render_template, request, session, url_for
 from functools import wraps
 from forms import LoginForm, PollForm, ChoiceForm, NewPollForm
 from models import Poll, Choice, Admin
@@ -54,25 +53,31 @@ def signin():
 @app.route('/admin', methods=['GET', 'POST'])
 def login():
     error = None
+    form = LoginForm()
+    if request.method == 'GET':
+        return render_template("login.html",
+                               form=form,
+                               error=error
+                               )
     if request.method=='POST':
-        u = Admin.query.filter_by(username=request.form['username'],
-                          password=request.form['password']).first()
-        if u is None:
+        admin_user = db.session.query(Admin).filter_by(
+            username=form.name.data,
+            password=form.password.data
+            )
+        if admin_user is None:
             error = 'Invalid username or password.'
         else:
+            print admin_user
             session['logged_in'] = True
-            session['user_id'] = u.id
+            #session['user_id'] = u.id
+            #session['user_id'] = admin_user.id
             flash('You are logged in. Go Crazy.')
             return redirect(url_for('edit'))
-
-    return render_template("login.html",
-                           form = LoginForm(),
-                           error = error)
 
 
 @app.route('/edit', methods=['GET','POST'])
 #@login_required
-def console():
+def edit():
     return "You are in edit mode; this may be a dashboard  rather than admin only being a login"
 
 @app.route('/detail/<int:poll_id>', methods=['GET','POST'])

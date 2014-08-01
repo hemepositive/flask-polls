@@ -1,5 +1,5 @@
 from app import db
-from app.models import Poll, Choice
+from app.models import Poll, Choice, Admin
 from datetime import date
 
 #db.drop_all()
@@ -17,6 +17,17 @@ choices = db.session.query(Choice).all()
 for e in choices:
     print e.id
     print e.poll
+
+print "\n================"
+print "===== Admin ===="
+print "================"
+admins = db.session.query(Admin).all()
+for admin in admins:
+    print admin.id
+    print admin.username
+    print admin.password
+
+
 '''
 >>> polls = Poll.query.all()
 >>> polls
