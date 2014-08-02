@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>Welcome to Flask-Polls</title>
+    <link rel="stylesheet" href="{{ url_for('static',
+                                 filename="admin/css/base.css") }}">
+    <link rel="stylesheet" href="{{ url_for('static',
+                                 filename="admin/css/login.css") }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',
+                                 filename="admin/css/dashboard.css") }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',
+                                 filename="admin/css/forms.css") }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',
+                                 filename="admin/css/changelists.css") }}">
+  </head>
+  <body>
+    <div class="page">
+    <!-- FLASH MESSAGES CODE -->
+      {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+        <br/>
+      {% endfor %}
+    <!-- ERROR MESSAGES CODE -->
+      {% if error %}
+        <div class="error"><strong>Error:</strong> {{ error }}</div>
+      {% endif %}
+    <!-- PAGE CONTENT BLOCK CODE -->
+      {% block content %}
+      {% endblock %}
+    </div>
+  </body>
+</html>
