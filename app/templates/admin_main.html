@@ -15,24 +15,10 @@
         </ul>
       <h3>Create a new poll</h3>
         <br/>
-        <p> You will be redirected to add questions.</p>
         <!--pass form data to 'add_poll' -->
         <form method="post" action="{{ url_for('add_poll') }}">
           <p>{{ form.question.label }}: {{ form.question }}<br/>
           <p><input type="submit" value="Submit"></p>
         </form>
+        <p> Add choices to your new poll from admin page!.</p>
 {% endblock %}
-
-<h3>Polls:</h3>
-    <ul>
-        {% for poll in polls %}
-          <li><em>{{ poll.question }}</em></li>
-          <p>Results:</p>
-            <ul>
-              {% for choice in poll.choices %}
-                <li>{{ choice.votes }}</li>
-              {% endfor %}
-            <br/>
-            </ul>
-        {% endfor %}
-    </ul>
