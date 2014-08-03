@@ -1,16 +1,19 @@
-{% extends "template.html" %}
+{% extends "admin_template.html" %}
 {% block content %}
     <h1>Welcome to Flask-Polls</h1>
     <br/>
-    <h2>Current Poll</h2>
+    <h2>Change Poll</h2>
     <br>
     <h3>{{ poll.question }}</h3>
-    <p>Click on a choice to vote!</p>
+    <p>Edit choices</p>
     <ul>Choices:
-    {% for p in poll %}
-       <li>{{ c.choices }}
-       <a href="{{ url_for('vote', choice_id = c.choices.id) }}">Click</a>
-       </li>
+    {% for c in poll.choices %}
+         <p>Original text:</p>
+         <li>{{ c.choice_text }}
+         <form method="post" action="{{url_for('update')}}">
+            <p>{{ form.choice.label }}:{{ form.choice }}<br/></p>
+            <p><input type="submit" value="Submit"></p>
+        </form>
     </ul>
     {% endfor %}
 {% endblock %}

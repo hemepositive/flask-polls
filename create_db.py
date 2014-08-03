@@ -34,12 +34,3 @@ db.session.add(admin)
 
 db.session.commit()
 
-'''
-polls = db.session.query(Poll).all()
-for e in polls:
-    print e
-
-choices = db.session.query(Choice).all()
-for e in choices:
-    print e
-'''

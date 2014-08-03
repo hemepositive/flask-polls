@@ -1,13 +1,11 @@
-{% extends "template.html" %}
+{% extends "admin_template.html" %}
 {% block content %}
     <h1>Welcome to Flask-Polls</h1>
     <br/>
-    <h2>Create a New Polls</h2>
+    <h2>Create a New Poll</h2>
     <br/>
     <form method="post" action="{{url_for('create_poll')}}">
       <p>{{ form.question.label }}: {{ form.question}}<br/>
-         {{ form.first_choice.label }}:{{ form.first_choice }}<br/>
-         {{ form.second_choice.label }}:{{ form.second_choice }}<br/></p>
       <p><input type="submit" value="Submit"></p>
     </form>
 {% endblock %}

@@ -1,16 +1,15 @@
 from app import app, db
-from flask import Flask, flash, redirect, render_template, request, session, url_for
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask import flash, redirect, render_template, request, session, url_for
 from functools import wraps
-from forms import LoginForm, PollForm, ChoiceForm, NewPollForm
+from forms import LoginForm, PollForm, ChoiceForm, NewPollForm, ChoicesForm
 from models import Poll, Choice, Admin
 
-"""
-todo:
--consider making admin screen like a dashboard for crud rather than all split up. That would be much better
--get login working so @login_required can be uncommented/useful
--finish update
-"""
+'''
+django-polls creates a new poll question first then questions added in
+a second function.
+
+django-polls allows for unlimited questions. Current MVP version with only two.
+'''
 
 # our login required decorator for the admin url
 def login_required(test):
@@ -32,48 +31,41 @@ def index():
                             polls=polls,
                             error = error)
 
-'''
-from explore flask
-
-@app.route('signin', methods=["GET", "POST"])
-def signin():
-    form = UsernamePasswordForm()
-
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first_or_404()
-        if user.is_correct_password(form.password.data):
-            login_user(user)
-
-            return redirect(url_for('index'))
-        else:
-            return redirect(url_for('signin'))
-    return render_template('signin.html', form=form)
-'''
-
-# admin login not working
 @app.route('/admin', methods=['GET', 'POST'])
 def login():
     error = None
+    form = LoginForm()
+    if request.method == 'GET':
+        return render_template("login.html",
+                               form=form,
+                               error=error
+                               )
     if request.method=='POST':
-        u = Admin.query.filter_by(username=request.form['username'],
-                          password=request.form['password']).first()
-        if u is None:
+        admin_user = db.session.query(Admin).filter_by(
+            username=form.name.data,
+            password=form.password.data
+            )
+        if admin_user is None:
             error = 'Invalid username or password.'
         else:
+            #print admin_user
             session['logged_in'] = True
-            session['user_id'] = u.id
+            #session['user_id'] = u.id
+            #session['user_id'] = admin_user.id
             flash('You are logged in. Go Crazy.')
-            return redirect(url_for('edit'))
+            return redirect(url_for('admin_main'))
 
-    return render_template("login.html",
-                           form = LoginForm(),
-                           error = error)
-
-
-@app.route('/edit', methods=['GET','POST'])
-#@login_required
-def console():
-    return "You are in edit mode; this may be a dashboard  rather than admin only being a login"
+@app.route('/admin_main', methods=['GET','POST'])
+@login_required
+def admin_main():
+    """ Skipping django main with CRUD for all models.
+    Going instead to url with 'add_poll' and 'change_poll'.
+    """
+    form = PollForm(crsf_enabled=False)
+    polls = Poll.query.all()
+    return render_template('admin_main.html',
+                           form=form,
+                           polls=polls)
 
 @app.route('/detail/<int:poll_id>', methods=['GET','POST'])
 def detail(poll_id):
@@ -86,17 +78,15 @@ def detail(poll_id):
 def vote(choice_id):
     # reassigning poll_id  to current_poll (why?)
     current_id = choice_id
-    # using fisrt_or_404 but does not work using db.session
+    # using fisrt_or_404 from Flakl_SQLAlchemy
     choice = Choice.query.filter_by(id=current_id).first_or_404()
-    print choice.votes
     new_total = choice.votes + 1
-    print choice.votes
     # db.session for updating
     db.session.query(Choice).filter_by(id=current_id).update({
         "votes": new_total})
     db.session.commit()
     flash('Thanks for your vote!')
-    # could send to results of this poll only but would use poll_id
+    # could send to results of this poll only but would need poll_id
     return redirect(url_for('results'))
 
 @app.route('/results')
@@ -104,68 +94,83 @@ def results():
     polls = db.session.query(Poll).all()
     return render_template('results.html', polls=polls)
 
+@app.route('/add_poll', methods = ['GET','POST'])
+@login_required
+def add_poll():
+    """ Function that allows admin to create a new poll """
+    error = None
+    form = PollForm(crsf_enabled=False)
+    if form.validate_on_submit():
+        if not form.question.data:
+            question = "Was there an error?"
+        else:
+            question = form.question.data
+        new_poll = Poll(question)
+        print new_poll
+        # add choices to new_poll
+        #new_poll.question = question
+        #new_poll.choices = second_choice
+        # add new_poll to database
+        db.session.add(new_poll)
+        db.session.commit()
+        flash("New poll created.")
+        return redirect(url_for('admin_main'))
+    else:
+        error = "Error in creation. Retry"
+        redirect(url_for('add_poll', error=error))
+    return render_template('admin_main.html', form=form, error=error)
+
+@app.route('/update/<int:poll_id>', methods=['GET','POST'])
+def update(poll_id):
+    """Update a poll from database"""
+    error = None
+    form = ChoicesForm(crsf_enabled=False)
+    if form.validate_on_submit():
+        current_poll = poll_id
+        poll = Poll.query.get_or_404(current_poll)
+        first_choice = models.Choice(form.choice_one.data)
+        second_choice = models.Choice(form.choice_two.data)
+        # add choices to new_poll
+        db.session.poll.choices = first_choice
+        db.session.poll.choices = second_choice
+        # now the database stuff
+        db.session.add_all([first_choice, second_choice])
+        db.session.commit()
+        flash("New choices created.")
+        return redirect(url_for('admin_main'))
+    else:
+        error = "Error in creation. Retry"
+        redirect(url_for('update', error=error))
+    return render_template('update.html', form=form, error=error)
+
+@app.route('/delete/<int:poll_id>', methods=['GET','POST'])
+def delete(poll_id):
+    """Deletes a poll from database"""
+    try:
+        current_poll = poll_id
+        db.session.query(Poll).filter_by(poll_id=current_poll).delete()
+        db.session.commit()
+        flash('The poll was deleted.')
+    except Exception as e:
+        flash("Error. Sending back to admin page.")
+        redirect(url_for('admin_main'))
+    return redirect(url_for('admin_main'))
+
+@app.route('/logout/')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('user_id', None)
+    flash('Admin logged out.')
+    return redirect (url_for('index'))
+
+
 '''
 ANOTHER EXAMPLE: id NOT reassigned
 @app.route('/todos/<int:id>')
 def todo_read(id):
     todo = Todo.query.get_or_404(id)
     return _todo_response(todo)
-'''
 
-#problem with POSTing the data
-@app.route('/create', methods = ['GET','POST'])
-#@login_required
-def create_poll():
-    """ Function that allows admin to create a new poll """
-    error = None
-    poll_form = NewPollForm(crsf_enabled=False)
-    if poll_form.validate_on_submit():
-        new_poll = models.Poll(form.question.data)
-        first_choice = models.Choice(form.first_choice.data)
-        second_choice = models.Choice(form.second_choice.data)
-        # add choices to new_poll
-        new_poll.choices = first_choice
-        new_poll.choices = second_choice
-        # now the database stuff
-        db.session.add_all([new_poll, first_choice, second_choice])
-        db.commit()
-        flash("New poll created.")
-        return redirect(url_for('create'))
-    else:
-        error = "Error in creation. Retry"
-        redirect(url_for('create_poll', error=error))
-    return render_template('create.html', form=poll_form, error=error)
-
-'''
-from: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
->>> john = Employee(name='john')
->>> it_department = Department(name='IT')
->>> john.department = it_department
->>> s = session()
->>> s.add(john)
->>> s.add(it_department)
->>> s.commit()
->>> it = s.query(Department).filter(Department.name == 'IT').one()
->>> it.employees
-[]
->>> it.employees[0].name
-u'john'
-'''
-
-@app.route('/update/<int:post_id>', methods=['GET','POST'])
-def update(post_id):
-    """Update a poll from database"""
-    pass
-    '''
-    poll_form = PollForm(crsf_enabled=False)
-    choice_form = ChoiceForm(crsf_enabled=False)
-    current_poll = poll_id
-    poll = db.session.query(Poll).get(poll_id=current_poll)
-    db.session.query(models.Flaskr).filter_by(post_id=new_id).()
-    db.session.commit()
-    flash('The poll has been updated.')
-    return redirect(url_for('edit'))
-    '''
 
 # work in progress
 @app.route('/delete/<int:poll_id>', methods=['GET','POST'])
@@ -207,3 +212,41 @@ def internal_error(error):
 def internal_error(error):
     return render_template('404.html'), 404
 
+from: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
+>>> john = Employee(name='john')
+>>> it_department = Department(name='IT')
+>>> john.department = it_department
+>>> s = session()
+>>> s.add(john)
+>>> s.add(it_department)
+>>> s.commit()
+>>> it = s.query(Department).filter(Department.name == 'IT').one()
+>>> it.employees
+[]
+>>> it.employees[0].name
+u'john'
+
+ADDING Choices
+first_choice = models.Choice(form.first_choice.data)
+    second_choice = models.Choice(form.second_choice.data)
+    current_poll = poll_id
+    poll = db.session.query(Poll).get(poll_id=current_poll)
+    db.session.query(models.Flaskr).filter_by(post_id=new_id).()
+    db.session.commit()
+    flash('The poll has been updated.')
+    return redirect(url_for('edit'))
+    error = None
+    poll_form = NewPollForm(crsf_enabled=False)
+    if poll_form.validate_on_submit():
+        new_poll = models.Poll(form.question.data)
+        first_choice = models.Choice(form.first_choice.data)
+        second_choice = models.Choice(form.second_choice.data)
+        # add choices to new_poll
+        new_poll.choices = first_choice
+        new_poll.choices = second_choice
+        # now the database stuff
+        db.session.add_all([new_poll, first_choice, second_choice])
+        db.commit()
+        flash("New poll created.")
+        return redirect(url_for('create'))
+'''

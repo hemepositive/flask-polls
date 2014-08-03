@@ -33,4 +33,11 @@ class ChoiceForm(Form):
     choice =TextField('Question', validators = [DataRequired(),
         Length(max=200)])
 
+class ChoicesForm(Form):
+    """ For editing a Poll from /admin """
+    choice_one =TextField('Question', validators = [DataRequired(),
+        Length(max=200)])
+    choice_two =TextField('Question', validators = [DataRequired(),
+        Length(max=200)])
+
 
