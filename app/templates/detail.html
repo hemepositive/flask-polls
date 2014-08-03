@@ -6,6 +6,7 @@
     <br>
     <h3>{{ poll.question }}</h3>
     <p>Click on a choice to vote!</p>
+    {% if poll.choices %}
     <ul>
       {% for choice in poll.choices %}
          <li><em>{{ choice.choice_text }}</em>
@@ -14,6 +15,9 @@
          <br/>
       {% endfor %}
     </ul>
+    {% else %}
+        <p>No choices in current poll.</p>
+      {% endif %}
 {% endblock %}
 
 

@@ -110,6 +110,9 @@ def add_poll():
         flash_errors(form)
     return redirect(url_for('admin_main'))
 
+'''
+# ORIGINAL
+
 @app.route('/update/<int:poll_id>', methods=['GET','POST'])
 def update(poll_id):
     """Update a poll from database"""
@@ -132,17 +135,51 @@ def update(poll_id):
 
     else:
         error = "Error in creation. Retry"
-        redirect(url_for('update', error=error, poll_id=poll_id))
+        redirect(url_for('update', error=error))
     """
     or
 
     else:
         flash_errors(form)
     """
+    #return "You are at update!"
     return render_template('update.html',
                            form=form,
                            error=error,
                            poll=poll)
+'''
+
+@app.route('/update/<int:poll_id>', methods=['GET','POST'])
+def update(poll_id):
+    """Update a poll from database"""
+    if request.method == 'GET':
+        error = None
+        poll = Poll.query.get_or_404(poll_id)
+        form = ChoicesForm(csrf_enabled=False)
+        return render_template('update.html',
+                           form=form,
+                           error=error,
+                           poll=poll)
+    if request.method == 'POST':
+        current_poll = poll_id
+        poll = Poll.query.get_or_404(current_poll)
+        first_choice = models.Choice(form.choice_one.data)
+        second_choice = models.Choice(form.choice_two.data)
+        # add choices to new_poll
+        db.session.poll.choices = first_choice
+        db.session.poll.choices = second_choice
+        # now the database stuff
+        db.session.add_all([first_choice, second_choice])
+        db.session.commit()
+        flash("New choices created.")
+        return redirect(url_for('admin_main'))
+
+    else:
+        error = "Error in creation. Retry"
+        #redirect(url_for('update', error=error)
+        return "You are at update!"
+
+
 
 @app.route('/delete/<int:poll_id>', methods=['GET','POST'])
 def delete(poll_id):

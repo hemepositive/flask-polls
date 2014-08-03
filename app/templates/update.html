@@ -15,14 +15,12 @@
           {% endfor %}
       </ul>
       {% else %}
-        <p>No choices in curent poll.</p>
+        <p>No choices in current poll.</p>
       {% endif %}
-
     <p>there should be a form below</p>
-         <form method="post" action="{{url_for('update')}}">
+         <form method="post" action="{{ url_for('update', poll_id=poll.id) }}">
             <p>{{ form.choice_one.label }}:{{ form.choice_one }}<br/></p>
             <p>{{ form.choice_two.label }}:{{ form.choice_two }}<br/></p>
             <p><input type="submit" value="Submit"></p>
          </form>
-
 {% endblock %}
