@@ -35,9 +35,9 @@ class ChoiceForm(Form):
 
 class ChoicesForm(Form):
     """ For editing a Poll from /admin """
-    choice_one =TextField('Question', validators = [DataRequired(),
+    choice_one =TextField('First question', validators = [DataRequired(),
         Length(max=200)])
-    choice_two =TextField('Question', validators = [DataRequired(),
+    choice_two =TextField('Second question', validators = [DataRequired(),
         Length(max=200)])
 
 

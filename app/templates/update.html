@@ -1,4 +1,5 @@
 {% extends "admin_template.html" %}
+
 {% block content %}
     <h1>Welcome to Flask-Polls</h1>
     <br/>
@@ -6,14 +7,22 @@
     <br>
     <h3>{{ poll.question }}</h3>
     <p>Edit choices</p>
-    <ul>Choices:
-    {% for c in poll.choices %}
-         <p>Original text:</p>
-         <li>{{ c.choice_text }}
+      {% if poll.choices %}
+      <ul>
+          {% for choice in poll.choices %}
+             <li>Original text: {{ choice.choice_text }}</li>
+             <br/>
+          {% endfor %}
+      </ul>
+      {% else %}
+        <p>No choices in curent poll.</p>
+      {% endif %}
+
+    <p>there should be a form below</p>
          <form method="post" action="{{url_for('update')}}">
-            <p>{{ form.choice.label }}:{{ form.choice }}<br/></p>
+            <p>{{ form.choice_one.label }}:{{ form.choice_one }}<br/></p>
+            <p>{{ form.choice_two.label }}:{{ form.choice_two }}<br/></p>
             <p><input type="submit" value="Submit"></p>
-        </form>
-    </ul>
-    {% endfor %}
+         </form>
+
 {% endblock %}

@@ -102,48 +102,19 @@ def add_poll():
     error = None
     form = PollForm(csrf_enabled=False)
     if form.validate_on_submit():
-        '''
-        if not form.question.data:
-            question = "Was there an error?"
-        else:
-            question = form.question.data
-        # add choices to new_poll
-        #new_poll.question = question
-        #new_poll.choices = second_choice
-        # add new_poll to database
-        db.session.add(new_poll)
-        db.session.commit()
-        flash("New poll created.")
-        return redirect(url_for('admin_main'))
-        '''
         new_poll = Poll(form.question.data)
-        print new_poll
         db.session.add(new_poll)
         db.session.commit()
         flash('New entry was successfully posted. Thanks.')
     else:
         flash_errors(form)
     return redirect(url_for('admin_main'))
-    """
-    else:
-        error = "Error in creation. Retry"
-        redirect(url_for('add_poll', error=error))
-
-    return render_template('admin_main.html', form=form, error=error)
-    """
-
-'''
-@app.route('/add_poll', methods = ['POST'])
-@login_required
-def add_poll():
-    #return "You are at add_poll! {}".format(form.question.data)
-    return "You are at add_poll! {}"
-'''
 
 @app.route('/update/<int:poll_id>', methods=['GET','POST'])
 def update(poll_id):
     """Update a poll from database"""
     error = None
+    poll = Poll.query.get_or_404(poll_id)
     form = ChoicesForm(csrf_enabled=False)
     if form.validate_on_submit():
         current_poll = poll_id
@@ -158,11 +129,11 @@ def update(poll_id):
         db.session.commit()
         flash("New choices created.")
         return redirect(url_for('admin_main'))
-    """
+
     else:
         error = "Error in creation. Retry"
-        redirect(url_for('update', error=error))
-
+        redirect(url_for('update', error=error, poll_id=poll_id))
+    """
     or
 
     else:
@@ -171,7 +142,7 @@ def update(poll_id):
     return render_template('update.html',
                            form=form,
                            error=error,
-                           poll_id=poll_id)
+                           poll=poll)
 
 @app.route('/delete/<int:poll_id>', methods=['GET','POST'])
 def delete(poll_id):
@@ -179,8 +150,13 @@ def delete(poll_id):
     Does not delete choices yet.
     """
     try:
-        current_poll = poll_id
-        db.session.query(Poll).filter_by(poll_id=current_poll).delete()
+        current_id = poll_id
+        print current_id
+        #obj = MyModel.query.get(the_id)
+        #session.delete(obj)
+        #db.session.query(Poll).delete(current_poll)
+        poll_for_delete = Poll.query.get_or_404(current_id)
+        db.session.delete(poll_for_delete)
         db.session.commit()
         flash('The poll was deleted.')
     except Exception as e:
