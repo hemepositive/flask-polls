@@ -6,18 +6,23 @@
     <br>
     <h3>{{ poll.question }}</h3>
     <p>Click on a choice to vote!</p>
-    {% if poll.choices %}
-    <ul>
-      {% for choice in poll.choices %}
-         <li><em>{{ choice.choice_text }}</em>
-           <a href="{{ url_for('vote', choice_id = choice.id) }}">Vote</a>
-         </li>
-         <br/>
-      {% endfor %}
-    </ul>
+    <div class="datagrid">
+    <table>
+        {% if poll.choices %}
+
+        <tr>
+         {% for choice in poll.choices %}
+        <th>Choice</th>
+            <td width="200">{{ choice.choice_text }}</td>
+            <td> <a href="{{ url_for('vote',
+                         choice_id = choice.id) }}">Vote</a></td>
+        </tr>
+           {% endfor %}
+          </table>
+    </div>
     {% else %}
         <p>No choices in current poll.</p>
-      {% endif %}
+    {% endif %}
 {% endblock %}
 
 
