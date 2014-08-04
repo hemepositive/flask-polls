@@ -36,7 +36,7 @@ def login():
     error = None
     form = LoginForm()
     if request.method == 'GET':
-        return render_template("login.html",
+        return render_template("admin_login.html",
                                form=form,
                                error=error
                                )

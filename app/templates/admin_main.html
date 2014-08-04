@@ -6,14 +6,20 @@
       <br/>
       <h3>Edit a poll:</h3>
         <br/>
-        <ul>
-          {% for p in polls %}
-             <li>{{ p.question }}
-             <a href="{{ url_for('update', poll_id = p.id) }}">Update</a>
-             <a href="{{ url_for('delete', poll_id = p.id) }}">Delete</a>
-             </li>
+         <div class="app-polls module">
+        <table>
+          <tr class="model-poll">
+           {% for p in polls %}
+           <th scope="row">{{ p.question }}</th>
+           <td><a class ="addlink" href="{{ url_for('update',
+                                         poll_id = p.id) }}">Update</a></td>
+           <td><a class ="deletelink" href="{{ url_for('delete',
+                                         poll_id = p.id) }}">Delete</a></td>
+           </tr>
           {% endfor %}
-        </ul>
+        </table>
+      </div>
+      <br/>
       <h3>Create a new poll</h3>
         <br/>
         <!--pass form data to 'add_poll' -->
@@ -23,3 +29,4 @@
         </form>
         <p> Add choices to your new poll from admin page!.</p>
 {% endblock %}
+

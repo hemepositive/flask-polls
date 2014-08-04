@@ -5,14 +5,20 @@
     <h2>Current Polls</h2>
     <p>Select a poll to participate!</p>
     <br/>
-    <h3>Polls:</h3>
-    <ul>
+    <div class="datagrid">
+    <table>
+      <thead>
+      <tr>
+      <th width="200">Poll</th>
+      <th>Select</th>
+      </tr>
+      </thead>
         {% for p in polls %}
-            <li><em>{{ p.question }}</em>
-               <a href="{{ url_for('detail', poll_id = p.id) }}">Select</a>
-            </li>
-            <br/>
+        <tr>
+          <td width="300">{{ p.question }}</td>
+          <td><a href="{{ url_for('detail', poll_id = p.id) }}">Select</a></td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
+    </div>
 {% endblock %}
-

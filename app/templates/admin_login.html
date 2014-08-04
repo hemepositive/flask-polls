@@ -1,0 +1,22 @@
+{% extends "admin_template.html" %}
+{% block content %}
+<body class=" login">
+
+<div id="container">
+  <h1>Welcome to Flask Polls.</h1>
+  <h3>Login to CRUD a poll.</h3>
+    <form id="login-form" method="post" action="">
+    <div class="form-row">
+      {{ form.name.label }}: {{ form.name }}
+    </div>
+    <div class="form-row">
+    {{ form.password.label }}: {{ form.password }}
+    </div>
+    <div class="submit-row">
+    <input type="submit" value="Submit">
+    </div>
+     </form>
+   </body>
+</div>
+{% endblock %}
+

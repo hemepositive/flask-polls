@@ -1,6 +1,7 @@
-<html>
-  <head>
-    <title>Welcome to Flask-Polls</title>
+<!DOCTYPE html>
+<html lang="en-us" >
+<head>
+<title>Site administration | Flask site admin</title>
     <link rel="stylesheet" href="{{ url_for('static',
                                  filename="admin/css/base.css") }}">
     <link rel="stylesheet" href="{{ url_for('static',
@@ -11,7 +12,28 @@
                                  filename="admin/css/forms.css") }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',
                                  filename="admin/css/changelists.css") }}">
-  </head>
+</head>
+
+<body class="dashboard">
+
+<!-- Container -->
+<div id="container">
+
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+<h1 id="site-name"><a href="/admin/">Flask administration</a></h1>
+        </div>
+        <div id="user-tools">
+                Welcome,
+                <strong>admin</strong>.
+                <!--
+                <a href="/admin/password_change/">Change password</a> /
+                -->
+                <a href="{{ url_for('logout') }}">Log out</a>
+        </div>
+    </div>
+    <!-- END Header -->
   <body>
     <div class="page">
     <!-- FLASH MESSAGES CODE -->
