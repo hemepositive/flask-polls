@@ -20,7 +20,7 @@ new = Poll('Can I call you sometime?')
 sure.poll = new
 nope.poll = new
 db.session.add_all([new, sure, nope])
-#db.session.commit()
+
 
 q = Poll('You got a phone number?')
 a = Choice('NO!')
@@ -31,6 +31,5 @@ db.session.add_all([a, b, q])
 
 admin = Admin(username='admin', password='admin')
 db.session.add(admin)
-
 db.session.commit()
 

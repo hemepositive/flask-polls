@@ -39,6 +39,7 @@ class AllTests(unittest.TestCase):
         # using Flask_SQLAlchemy method
         admin_get = Admin.query.get(1)
         assert admin_get.username == 'test_username'
+        assert admin_get.password == 'test_password'
         
     def test_poll_creation(self):
         new_poll = Poll(
@@ -51,6 +52,38 @@ class AllTests(unittest.TestCase):
         for poll in all_polls:
             poll.question
         assert poll.question == 'test_question?'
+        
+    def test_choice_creation(self):
+        new_choice = Choice(
+            choice_text = 'test this choice'
+        )
+        db.session.add(new_choice)
+        db.session.commit()
+        # using Flask_SQLAlchemy method
+        all_choices = Choice.query.all()
+        for choice in all_choices:
+            choice.choice_text
+        assert choice.choice_text == 'test this choice'
+        
+    def test_choice_to_poll_relationships(self):
+        test_poll = Poll(
+            question = "Want to do some testing?"
+        )
+        choice_one = Choice(
+            choice_text = 'Right now!'
+        )
+        choice_two = Choice(
+            choice_text = 'Not today.'
+        )
+        choice_one.poll = test_poll
+        choice_two.poll = test_poll
+        db.session.add_all([test_poll, choice_one, choice_two])
+        db.session.commit()
+        # using Flask_SQLAlchemy method
+        choices = Choice.query.all()
+        for entry in choices:
+            entry.poll.question
+        assert entry.poll.question == "Want to do some testing?"
     
     # VIEWS tests
     
@@ -63,7 +96,7 @@ class AllTests(unittest.TestCase):
         ''' A helper function for testing admin '''
         return self.app.post('/admin', 
                             data=dict(
-                                name=username,
+                                name=name,
                                 password=password
                             ),
                             follow_redirects=True
@@ -72,6 +105,10 @@ class AllTests(unittest.TestCase):
     def test_true_Admin_can_access_dashboard(self):
         resp = self.login_helper('test_username', 'test_password')
         self.assertIn('Admin Console', resp.data)
+        
+    def test_url_route_for_admin_login_error(self):
+        resp = self.login_helper('test_username', 'test_password')
+        self.assertEqual(resp.status_code, 302)
     
     def test_non_Admin_cannot_access_dashboard(self):
         resp = self.login_helper('wrong', 'wrongagain')
