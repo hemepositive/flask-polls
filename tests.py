@@ -59,19 +59,23 @@ class AllTests(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Flask administration', resp.data)
     
-    def login_helper(self, username, password):
+    def login_helper(self, name, password):
         ''' A helper function for testing admin '''
         return self.app.post('/admin', 
                             data=dict(
-                                username=username,
+                                name=username,
                                 password=password
                             ),
                             follow_redirects=True
                             )
     
+    def test_true_Admin_can_access_dashboard(self):
+        resp = self.login_helper('test_username', 'test_password')
+        self.assertIn('Admin Console', resp.data)
+    
     def test_non_Admin_cannot_access_dashboard(self):
         resp = self.login_helper('wrong', 'wrongagain')
-        self.assertIn("Invalid username or password.", resp.data)
+        self.assertIn('Invalid username or password.', resp.data)
         
     
     

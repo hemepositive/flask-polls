@@ -44,14 +44,18 @@ def login():
         admin_user = db.session.query(Admin).filter_by(
             username=form.name.data,
             password=form.password.data
-            )
+            ).first()
         if admin_user is None:
             error = 'Invalid username or password.'
+            return render_template(
+                    "admin_login.html",
+                    form=form,
+                    error=error
+                )
         else:
-            #print admin_user
             session['logged_in'] = True
             #session['user_id'] = u.id
-            #session['user_id'] = admin_user.id
+            session['user_id'] = admin_user.id
             flash('You are logged in. Go Crazy.')
             return redirect(url_for('admin_main'))
 
@@ -202,6 +206,7 @@ def delete(poll_id):
     return redirect(url_for('admin_main'))
 
 @app.route('/logout/')
+@login_required
 def logout():
     session.pop('logged_in', None)
     session.pop('user_id', None)
