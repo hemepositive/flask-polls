@@ -18,28 +18,56 @@ class AllTests(unittest.TestCase):
         
     def tearDown(self):
         db.drop_all()
-        
-    def test_admin_setup(self):
-        admin_user = Admin(
-            username='test_username', 
-            password= 'test_password'
+    
+    # Helper functions
+    
+    def login_helper(self, name, password):
+        ''' A helper function for testing admin '''
+        return self.app.post('/admin',
+                            data=dict(
+                                name=name,
+                                password=password
+                            ),
+                            follow_redirects=True
+                        )
+    
+    def logout_helper(self):
+        return self.app.get('logout/', follow_redirects=True)
+    
+    def create_poll_setup(self):
+        new_poll = Poll(
+            question = 'This is a test question?'
         )
-        db.session.add(admin_user)
+        db.session.add(new_poll)
+        db.session.commit()
+        
+    def create_choices_setup(self):
+        choice_one = Choice(
+            choice_text = 'Test choice one.'
+        )
+        choice_two = Choice(
+            choice_text = 'Test choice two.'
+        )
+        db.session.add_all([choice_one, choice_two])
         db.session.commit()
         
     # MODELS tests
     
     def test_admin_exists_in_database(self):
         admin_user = Admin(
-            username='test_username', 
-            password= 'test_password'
+            username = 'test_username', 
+            password = 'test_password'
         )
         db.session.add(admin_user)
         db.session.commit()
-        # using Flask_SQLAlchemy method
-        admin_get = Admin.query.get(1)
-        assert admin_get.username == 'test_username'
-        assert admin_get.password == 'test_password'
+        admin_get = Admin.query.all()
+        for entry in admin_get:
+            entry.username
+        assert entry.username == 'test_username'
+        
+    def test_poll_exists_in_database(self):
+        poll = Poll.query.first()
+        assert poll.question == 'This is a test question?'
         
     def test_poll_creation(self):
         new_poll = Poll(
@@ -91,16 +119,6 @@ class AllTests(unittest.TestCase):
         resp = self.app.get('/admin')
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Flask administration', resp.data)
-    
-    def login_helper(self, name, password):
-        ''' A helper function for testing admin '''
-        return self.app.post('/admin', 
-                            data=dict(
-                                name=name,
-                                password=password
-                            ),
-                            follow_redirects=True
-                            )
     
     def test_true_Admin_can_access_dashboard(self):
         resp = self.login_helper('test_username', 'test_password')
