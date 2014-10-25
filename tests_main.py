@@ -7,7 +7,7 @@ from app.models import Poll, Choice, Admin
 TEST_DB = 'test.db'
 
 class AllTests(unittest.TestCase):
-    # the setup
+    
     def setUp(self):
         app.config['TESTING'] = True
         app.config['WTF_CSRF_TESTING'] = False
